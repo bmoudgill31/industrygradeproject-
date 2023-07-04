@@ -1,3 +1,4 @@
+---
 - hosts: localhost
   gather_facts: no
   become: yes
@@ -11,12 +12,12 @@
     - name: start a container
       community.docker.docker_container:
         name: abc-dockercontainer
-        image: abdulpurduedevops/abctechnologies:{{ lookup('env', 'BUILDNUM') }}
+        image: bmoudgill31/abctechnologies:{{ lookup('env', 'BUILDNUM') }}
         state: started
         ports:
           - 2255:8080
       register: container_out
-
+      
     - name: Create a Deployment
       kubernetes.core.k8s:
         state: present
@@ -37,15 +38,15 @@
                   app: abc-webapp
               spec:
                 containers:
-                - name: my-container
-                  image: abdulpurduedevops/abctechnologies:{{ lookup('env', 'BUILDNUM') }}
-                  ports:
-                  - containerPort: 80
-        namespace: "{{ customnamespace }}"
+                  - name: my-container
+                    image: bmoudgill31/abctechnologies:{{ lookup('env', 'BUILDNUM') }}
+                    ports:
+                      - containerPort: 80
+                namespace: "{{ customnamespace }}"
       register: deployment_out
       vars:
         build_number: "{{ lookup('env', 'BUILDNUM') }}"
-
+        
     - name: Create a Service
       kubernetes.core.k8s:
         state: present
@@ -60,22 +61,22 @@
             selector:
               app: abc-webapp
             ports:
-            - name: http
-              port: 80
-              targetPort: 8080
-        namespace: "{{ customnamespace }}"
+              - name: http
+                port: 80
+                targetPort: 8080
+            namespace: "{{ customnamespace }}"
       register: service_out
       vars:
         build_number: "{{ lookup('env', 'BUILDNUM') }}"
-
+        
     - name: Debug Container Output
       debug:
         var: container_out
-
+        
     - name: Debug Deployment Output
       debug:
         var: deployment_out
-
+        
     - name: Debug Service Output
       debug:
         var: service_out
