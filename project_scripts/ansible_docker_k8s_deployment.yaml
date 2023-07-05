@@ -12,7 +12,7 @@
     - name: start a container
       community.docker.docker_container:
         name: abc-dockercontainer
-        image: bmoudgill31/abctechnologies:{{ lookup('env', 'BUILDNUM') }}
+        image: bmoudgill31/abctechnologies:{{ lookup('env', 'BUILD_NUMBER') }}
         state: started
         ports:
           - 2255:8080
@@ -39,13 +39,13 @@
               spec:
                 containers:
                   - name: my-container
-                    image: bmoudgill31/abctechnologies:{{ lookup('env', 'BUILDNUM') }}
+                    image: bmoudgill31/abctechnologies:{{ lookup('env', 'BUILD_NUMBER') }}
                     ports:
                       - containerPort: 80
                 namespace: "{{ customnamespace }}"
       register: deployment_out
       vars:
-        build_number: "{{ lookup('env', 'BUILDNUM') }}"
+        build_number: "{{ lookup('env', 'BUILD_NUMBER') }}"
         
     - name: Create a Service
       kubernetes.core.k8s:
@@ -67,7 +67,7 @@
             namespace: "{{ customnamespace }}"
       register: service_out
       vars:
-        build_number: "{{ lookup('env', 'BUILDNUM') }}"
+        build_number: "{{ lookup('env', 'BUILD_NUMBER') }}"
         
     - name: Debug Container Output
       debug:
